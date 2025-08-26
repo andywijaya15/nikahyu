@@ -1,0 +1,42 @@
+services:
+  nikahyu_server:
+    container_name: nikahyu_server
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "80:80" # HTTP
+      - "443:443" # HTTPS
+      - "443:443/udp" # HTTP/3
+    volumes:
+      - ./:/app
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - nikahyu_network
+    tty: true
+
+  nikahyu_db:
+    image: postgres:17.3-alpine
+    container_name: nikahyu_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: nikahyu
+      POSTGRES_PASSWORD: nikahyu
+      POSTGRES_DB: nikahyu
+    # ports:
+    #   - "5432:5432"
+    volumes:
+      - nikahyu_pg:/var/lib/postgresql/data
+    networks:
+      - nikahyu_network
+
+volumes:
+  caddy_data:
+  caddy_config:
+  nikahyu_pg:
+
+networks:
+  nikahyu_network:
+    driver: bridge
