@@ -1,3 +1,5 @@
+FROM composer:2 AS composer_stage
+
 FROM dunglas/frankenphp:latest
 
 RUN install-php-extensions \
@@ -7,6 +9,8 @@ RUN install-php-extensions \
     opcache \
     pcntl \
     zip
+
+COPY --from=composer_stage /usr/bin/composer /usr/local/bin/composer
 
 WORKDIR /app
 
